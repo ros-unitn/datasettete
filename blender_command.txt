@@ -1,1 +1,0 @@
-/usr/local/blender/blender world_new.blend --python blender.py

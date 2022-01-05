@@ -1,2 +1,10 @@
 # Training cache 
 *.cache
+
+bboxes/*
+images/*
+labels/*
+
+!bboxes/.gitkeep
+!images/.gitkeep
+!labels/.gitkeep

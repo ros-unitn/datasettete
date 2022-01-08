@@ -65,8 +65,6 @@ def make_depth_map(img_path):
     # create input render layer node
     rl = tree.nodes.new('CompositorNodeRLayers')    
     n = tree.nodes.new('CompositorNodeNormalize')    
-    inv = tree.nodes.new('CompositorNodeInvert')
-    inv.invert_rgb = True
 
     # create output node
     c = tree.nodes.new('CompositorNodeComposite')   
@@ -74,8 +72,7 @@ def make_depth_map(img_path):
 
     # Links
     l1 = links.new(rl.outputs['Depth'], n.inputs['Value']) # link Z to output
-    l2 = links.new(n.outputs['Value'], inv.inputs['Color']) # link Z to output
-    l3 = links.new(inv.outputs['Color'], c.inputs['Image']) # link Z to output
+    l2 = links.new(n.outputs['Value'], c.inputs['Image'])
 
     # render
     render_picture(str(depth.joinpath(img_path)))
@@ -83,10 +80,8 @@ def make_depth_map(img_path):
     # delete links and nodes
     links.remove(l1)
     links.remove(l2)
-    links.remove(l3)
     tree.nodes.remove(rl)
     tree.nodes.remove(n)
-    tree.nodes.remove(inv)
     tree.nodes.remove(c)
 
 def make_pictures(i):

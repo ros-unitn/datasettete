@@ -1,5 +1,4 @@
 import random
-import sys
 import cv2
 import os
 from pathlib import Path
@@ -47,6 +46,8 @@ for dir in [images, bboxes, labels, depth]:
 img_width = 1024
 table_width = 0.64
 table_height = 0.75
+
+start_from = 0
 iterations = 5000
 
 def render_picture(file_path_str):
@@ -270,6 +271,5 @@ def process(i):
             bpy.data.objects[name].select_set(True)
             bpy.ops.object.delete()
 
-start_from = 1
 for i in tqdm(range(start_from, iterations)):
     process(i)

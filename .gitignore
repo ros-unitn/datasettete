@@ -4,7 +4,9 @@
 bboxes/*
 images/*
 labels/*
+depth/*
 
+!depth/.gitkeep
 !bboxes/.gitkeep
 !images/.gitkeep
 !labels/.gitkeep

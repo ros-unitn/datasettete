@@ -90,6 +90,19 @@ def make_depth_map(img_path):
     tree.nodes.remove(c)
 
 def make_pictures(i):
+    # adding random noise
+    mat = bpy.data.materials['Material.003']
+    if random.choice([False, True]): # some pics with noise, some without
+        mat.node_tree.nodes["Noise Texture"].inputs["Scale"].default_value = random.uniform(0, 7)
+        mat.node_tree.nodes["Noise Texture"].inputs["Detail"].default_value = random.uniform(0, 7)
+        mat.node_tree.nodes["Noise Texture"].inputs["Roughness"].default_value = random.uniform(0, 7)
+        mat.node_tree.nodes["Noise Texture"].inputs["Distortion"].default_value = random.uniform(0, 3)
+    else:
+        mat.node_tree.nodes["Noise Texture"].inputs["Scale"].default_value = 0
+        mat.node_tree.nodes["Noise Texture"].inputs["Detail"].default_value = 0
+        mat.node_tree.nodes["Noise Texture"].inputs["Roughness"].default_value = 0
+        mat.node_tree.nodes["Noise Texture"].inputs["Distortion"].default_value = 0
+    
     for name in names:
         if random.choice([True, False]):
             x = random.uniform(-table_width / 2, table_width / 2)  # table x(-0.375,0.375)

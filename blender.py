@@ -92,16 +92,17 @@ def make_depth_map(img_path):
 def make_pictures(i):
     # adding random noise
     mat = bpy.data.materials['Material.003']
+    ntree_noise = mat.node_tree.nodes["Noise Texture"]
     if random.choice([False, True]): # some pics with noise, some without
-        mat.node_tree.nodes["Noise Texture"].inputs["Scale"].default_value = random.uniform(0, 7)
-        mat.node_tree.nodes["Noise Texture"].inputs["Detail"].default_value = random.uniform(0, 7)
-        mat.node_tree.nodes["Noise Texture"].inputs["Roughness"].default_value = random.uniform(0, 7)
-        mat.node_tree.nodes["Noise Texture"].inputs["Distortion"].default_value = random.uniform(0, 3)
+        ntree_noise.inputs["Scale"].default_value = random.uniform(0, 7)
+        ntree_noise.inputs["Detail"].default_value = random.uniform(0, 7)
+        ntree_noise.inputs["Roughness"].default_value = random.uniform(0, 7)
+        ntree_noise.inputs["Distortion"].default_value = random.uniform(0, 3)
     else:
-        mat.node_tree.nodes["Noise Texture"].inputs["Scale"].default_value = 0
-        mat.node_tree.nodes["Noise Texture"].inputs["Detail"].default_value = 0
-        mat.node_tree.nodes["Noise Texture"].inputs["Roughness"].default_value = 0
-        mat.node_tree.nodes["Noise Texture"].inputs["Distortion"].default_value = 0
+        ntree_noise.inputs["Scale"].default_value = 0
+        ntree_noise.inputs["Detail"].default_value = 0
+        ntree_noise.inputs["Roughness"].default_value = 0
+        ntree_noise.inputs["Distortion"].default_value = 0
     
     for name in names:
         if random.choice([True, False]):

@@ -2,7 +2,7 @@ import random
 import cv2
 import os
 from pathlib import Path
-
+import math
 from tqdm.std import tqdm
 
 import bpy
@@ -24,7 +24,7 @@ names = [
 ]
 ok = False
 
-images = Path("color")
+images = Path("images")
 bboxes = Path("bboxes")
 labels = Path("labels")
 depth = Path("depth")
@@ -91,8 +91,25 @@ def make_depth_map(img_path):
     tree.nodes.remove(c)
 
 def make_pictures(i):
-    # adding random noise
+
+
+    #changing sum parameters
+    sun = bpy.data.lights["Sun"]
+    #sun = bpy.context.scene.objects["Sun"].data
+
+    #sun.color = (1.0, 0.0, 0.0)
+    sun.energy = random.uniform(3, 20)
+    sun.specular_factor = random.uniform(0.1, 0.9) #0.5 const
+    sun.angle = math.pi * random.uniform(1,10) / 180.0  # In radians, it was 10 const
+
+
+    # rotating texture
     mat = bpy.data.materials['Material.003']
+    txt_mapping = mat.node_tree.nodes["Mapping"]
+    txt_mapping.inputs["Rotation"].default_value[2] = random.randrange(0,361)
+
+
+    #adding random noise
     ntree_noise = mat.node_tree.nodes["Noise Texture"]
     if random.choice([False, True]): # some pics with noise, some without
         ntree_noise.inputs["Scale"].default_value = random.uniform(0, 7)

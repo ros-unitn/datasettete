@@ -1,12 +1,13 @@
 # Training cache 
 *.cache
 
+images
 bboxes/*
-images/*
+color/*
 labels/*
 depth/*
 
 !depth/.gitkeep
 !bboxes/.gitkeep
-!images/.gitkeep
+!color/.gitkeep
 !labels/.gitkeep

@@ -24,7 +24,7 @@ names = [
 ]
 ok = False
 
-images = Path("images")
+images = Path("color")
 bboxes = Path("bboxes")
 labels = Path("labels")
 depth = Path("depth")

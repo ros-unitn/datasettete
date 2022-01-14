@@ -3,11 +3,11 @@
 
 images
 bboxes/*
-color/*
+colors/*
 labels/*
 depth/*
 
 !depth/.gitkeep
 !bboxes/.gitkeep
-!color/.gitkeep
+!colors/.gitkeep
 !labels/.gitkeep

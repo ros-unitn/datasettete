@@ -24,7 +24,7 @@ names = [
 ]
 ok = False
 
-images = Path("images")
+colors = Path("colors")
 bboxes = Path("bboxes")
 labels = Path("labels")
 depth = Path("depth")
@@ -39,7 +39,7 @@ stages = [
     test
 ]
 
-for dir in [images, bboxes, labels, depth]:
+for dir in [colors, bboxes, labels, depth]:
     for stage in stages:
         dir.joinpath(stage).mkdir(exist_ok=True, parents=True)
 
@@ -181,11 +181,11 @@ def make_pictures(i):
     img_path = stage.joinpath(f"img{i}.jpeg")
     txt_path = stage.joinpath(f"img{i}.txt")
 
-    render_picture(str(images.joinpath(img_path)))
-    make_depth_map(img_path)
+    render_picture(str(colors.joinpath(img_path)))
+    # make_depth_map(img_path)
 
     count_obj = 0
-    img = cv2.imread(str(images.joinpath(img_path)))
+    img = cv2.imread(str(colors.joinpath(img_path)))
 
     with open(labels.joinpath(txt_path), "w") as f:
         for name in names:
@@ -263,8 +263,8 @@ def make_pictures(i):
         cv2.imwrite(str(bboxes.joinpath(img_path)), img)
         return True
     else:
-        os.remove(images.joinpath(img_path))
-        os.remove(depth.joinpath(img_path))
+        os.remove(colors.joinpath(img_path))
+        # os.remove(depth.joinpath(img_path))
         os.remove(labels.joinpath(txt_path))
         return False
 

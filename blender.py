@@ -52,61 +52,17 @@ start_from = 0
 iterations = 5000
 
 def render_picture(file_path_str):
-
-
-    """all_frames = range(scene.frame_start, scene.frame_end + 1)
-
-    for f in [f for f in all_frames if f%2 == 0 or f%10 == 5]:
-        scene.frame_set(f)
-        scene.render.filepath = '//frame_{:04d}'.format(f)  # frame_0000 etc.
-        bpy.ops.render.render(write_still=True)"""
-
     bpy.context.scene.frame_set(30)
     bpy.context.scene.render.filepath = file_path_str
     bpy.context.scene.render.resolution_x = img_width
     bpy.context.scene.render.resolution_y = img_width
     bpy.context.scene.render.image_settings.file_format = "JPEG"
     bpy.ops.render.render(write_still=1)
-
-def make_depth_map(img_path):
-    #switch on nodes
-    bpy.context.scene.use_nodes = True
-    tree = bpy.context.scene.node_tree
-    links = tree.links
-
-    # create input render layer node
-    rl = tree.nodes.new('CompositorNodeRLayers')    
-    n = tree.nodes.new('CompositorNodeNormalize')    
-    inv = tree.nodes.new('CompositorNodeInvert')
-    inv.invert_rgb = True
-
-    # create output node
-    c = tree.nodes.new('CompositorNodeComposite')   
-    c.use_alpha = True
-
-    # Links
-    l1 = links.new(rl.outputs['Depth'], n.inputs['Value']) # link Z to output
-    l2 = links.new(n.outputs['Value'], inv.inputs['Color']) # link Z to output
-    l3 = links.new(inv.outputs['Color'], c.inputs['Image']) # link Z to output
-
-    # render
-    render_picture(str(depth.joinpath(img_path)))
-
-    # delete links and nodes
-    links.remove(l1)
-    links.remove(l2)
-    links.remove(l3)
-    tree.nodes.remove(rl)
-    tree.nodes.remove(n)
-    tree.nodes.remove(inv)
-    tree.nodes.remove(c)
+    raise "ciao"
 
 def make_pictures(i):
-
-
     #changing sum parameters
     sun = bpy.data.lights["Sun"]
-    #sun = bpy.context.scene.objects["Sun"].data
 
     #sun.color = (1.0, 0.0, 0.0)
     sun.energy = random.uniform(3, 20)
@@ -165,6 +121,15 @@ def make_pictures(i):
             m = ob.modifiers.new("Solidify", type="SOLIDIFY")
             m.thickness = 0.00001
 
+            # first select object
+            bpy.data.objects[name].select_set(state=True)
+            # then
+            bpy.ops.rigidbody.object_add(type="ACTIVE")
+            bpy.ops.rigidbody.enabled = True
+            bpy.ops.rigidbody.mass = 0.0025 #in kg (perhaps)
+            bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
+            bpy.data.objects[name].select_set(state=False)
+
             if random.choice([True, False]):
                 original_type = bpy.context.area.type
                 bpy.context.area.type = "VIEW_3D"
@@ -178,25 +143,6 @@ def make_pictures(i):
                     bpy.ops.transform.translate(
                         value=(0, 0, diff), orient_type="GLOBAL"
                     )
-
-            # first select object
-            bpy.data.objects[name].select_set(state=True)
-            # then
-            bpy.ops.rigidbody.object_add(type="ACTIVE")
-            bpy.ops.rigidbody.enabled = True
-            bpy.ops.rigidbody.mass = 0.0025 #in kg (perhaps)
-            bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
-            bpy.context.scene.gravity = (0, 0, -9.81)
-            bpy.context.scene.use_gravity = True
-            #bpy.ops.cycles_visibility.shadow = False
-            #bpy.ops.visible_shadow = False
-            #bpy.data.objects[name].visible_shadow = False
-            bpy.data.objects[name].select_set(state=False)
-
-            # disable shadows
-            #for obj in bpy.context.selected_objects:
-            	#bpy.context.scene.objects.active = obj
-            	#bpy.context.object.cycles_visibility.shadow = False
 		
 
     stage = stages[(i * len(stages)) // iterations]
@@ -204,7 +150,6 @@ def make_pictures(i):
     txt_path = stage.joinpath(f"img{i}.txt")
 
     render_picture(str(images.joinpath(img_path)))
-    make_depth_map(img_path)
 
     count_obj = 0
     img = cv2.imread(str(images.joinpath(img_path)))
@@ -286,7 +231,6 @@ def make_pictures(i):
         return True
     else:
         os.remove(images.joinpath(img_path))
-        os.remove(depth.joinpath(img_path))
         os.remove(labels.joinpath(txt_path))
         return False
 
@@ -318,6 +262,10 @@ def process(i):
         if name in bpy.data.objects:
             bpy.data.objects[name].select_set(True)
             bpy.ops.object.delete()
+
+
+bpy.context.scene.gravity = (0, 0, -9.81)
+bpy.context.scene.use_gravity = True
 
 for i in tqdm(range(start_from, iterations)):
     process(i)

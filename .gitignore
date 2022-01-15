@@ -5,9 +5,7 @@ images
 bboxes/*
 colors/*
 labels/*
-depth/*
 
-!depth/.gitkeep
 !bboxes/.gitkeep
 !colors/.gitkeep
 !labels/.gitkeep

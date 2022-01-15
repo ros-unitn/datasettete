@@ -24,7 +24,7 @@ names = [
 ]
 ok = False
 
-colors = Path("colors")
+images = Path("images")
 bboxes = Path("bboxes")
 labels = Path("labels")
 depth = Path("depth")
@@ -40,7 +40,7 @@ stages = [
     test
 ]
 
-for dir in [colors, bboxes, labels, depth]:
+for dir in [images, bboxes, labels, depth]:
     for stage in stages:
         dir.joinpath(stage).mkdir(exist_ok=True, parents=True)
 
@@ -52,6 +52,16 @@ start_from = 0
 iterations = 5000
 
 def render_picture(file_path_str):
+
+
+    """all_frames = range(scene.frame_start, scene.frame_end + 1)
+
+    for f in [f for f in all_frames if f%2 == 0 or f%10 == 5]:
+        scene.frame_set(f)
+        scene.render.filepath = '//frame_{:04d}'.format(f)  # frame_0000 etc.
+        bpy.ops.render.render(write_still=True)"""
+
+    bpy.context.scene.frame_set(30)
     bpy.context.scene.render.filepath = file_path_str
     bpy.context.scene.render.resolution_x = img_width
     bpy.context.scene.render.resolution_y = img_width
@@ -92,6 +102,8 @@ def make_depth_map(img_path):
     tree.nodes.remove(c)
 
 def make_pictures(i):
+
+
     #changing sum parameters
     sun = bpy.data.lights["Sun"]
     #sun = bpy.context.scene.objects["Sun"].data
@@ -172,19 +184,30 @@ def make_pictures(i):
             # then
             bpy.ops.rigidbody.object_add(type="ACTIVE")
             bpy.ops.rigidbody.enabled = True
+            bpy.ops.rigidbody.mass = 0.0025 #in kg (perhaps)
+            bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
             bpy.context.scene.gravity = (0, 0, -9.81)
             bpy.context.scene.use_gravity = True
+            #bpy.ops.cycles_visibility.shadow = False
+            #bpy.ops.visible_shadow = False
+            #bpy.data.objects[name].visible_shadow = False
             bpy.data.objects[name].select_set(state=False)
+
+            # disable shadows
+            #for obj in bpy.context.selected_objects:
+            	#bpy.context.scene.objects.active = obj
+            	#bpy.context.object.cycles_visibility.shadow = False
+		
 
     stage = stages[(i * len(stages)) // iterations]
     img_path = stage.joinpath(f"img{i}.jpeg")
     txt_path = stage.joinpath(f"img{i}.txt")
 
-    render_picture(str(colors.joinpath(img_path)))
-    # make_depth_map(img_path)
+    render_picture(str(images.joinpath(img_path)))
+    make_depth_map(img_path)
 
     count_obj = 0
-    img = cv2.imread(str(colors.joinpath(img_path)))
+    img = cv2.imread(str(images.joinpath(img_path)))
 
     with open(labels.joinpath(txt_path), "w") as f:
         for name in names:
@@ -262,16 +285,25 @@ def make_pictures(i):
         cv2.imwrite(str(bboxes.joinpath(img_path)), img)
         return True
     else:
-        os.remove(colors.joinpath(img_path))
-        # os.remove(depth.joinpath(img_path))
+        os.remove(images.joinpath(img_path))
+        os.remove(depth.joinpath(img_path))
         os.remove(labels.joinpath(txt_path))
         return False
 
-
+i = 0
 def stop_playback(scene):
-    if scene.frame_current == 30:
-        bpy.ops.screen.animation_cancel(restore_frame=False)
-        ok = True
+    while scene.frame_current < 30:
+        pass
+    global i
+    make_pictures(i)
+    bpy.ops.screen.animation_cancel(restore_frame=True)
+
+    for name in names:
+        if name in bpy.data.objects:
+            bpy.data.objects[name].select_set(True)
+            bpy.ops.object.delete()
+
+    i = i+1
 
 def object_lowest_point(obj):
     matrix_w = obj.matrix_world
@@ -289,3 +321,7 @@ def process(i):
 
 for i in tqdm(range(start_from, iterations)):
     process(i)
+    #bpy.app.handlers.frame_change_pre.append(stop_playback)
+    #bpy.ops.screen.animation_play()
+    #stop_playback(bpy.ops.scene, i)
+
